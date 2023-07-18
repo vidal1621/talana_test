@@ -3,68 +3,64 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 
-def calcular_energia(energia, golpe):
-    if golpe == 'P':
-        return max(0, energia - 1)
-    elif golpe == 'K':
-        return max(0, energia - 2)
-    else:
-        return energia
+class Jugador:
+    def __init__(self, movimientos, golpes, nombre):
+        self.movimientos = movimientos
+        self.golpes = golpes
+        self.nombre = nombre
+        self.energia = 6
+
+    def calcular_energia(self, golpe):
+        if golpe == 'P':
+            self.energia = max(0, self.energia - 1)
+        elif golpe == 'K':
+            self.energia = max(0, self.energia - 2)
+
+    def realizar_movimiento(self, movimiento):
+        return f'{self.nombre} realiza el movimiento {movimiento}'
+
+    def ejecutar_golpe(self, golpe):
+        return f'{self.nombre} ejecuta el golpe {golpe}'
 
 
 @app.route('/pelea', methods=['POST'])
 def ejecutar_pelea():
-    # Obtener los datos JSON de la solicitud
     pelea = request.json
 
-    # Obtener los datos de los jugadores
-    player1 = pelea['player1']
-    player2 = pelea['player2']
+    # Crear instancia del jugador 1
+    player1 = Jugador(pelea['player1'].get('movimientos', []), pelea['player1'].get('golpes', []), 'Tonyn')
 
-    # Obtener los movimientos y golpes de cada jugador
-    movimientos_player1 = player1.get('movimientos', [])
-    golpes_player1 = player1.get('golpes', [])
-    movimientos_player2 = player2.get('movimientos', [])
-    golpes_player2 = player2.get('golpes', [])
+    # Crear instancia del jugador 2
+    player2 = Jugador(pelea['player2'].get('movimientos', []), pelea['player2'].get('golpes', []), 'Arnaldor')
 
-    # Inicializar la energía de los jugadores y el turno
-    energia_player1 = 6
-    energia_player2 = 6
-    turno = 1
-
-    # Lista para almacenar el resultado de la pelea
     resultado = []
 
     # Iterar sobre los movimientos y golpes de ambos jugadores
-    for movimiento_player1, golpe_player1, movimiento_player2, golpe_player2 in zip(movimientos_player1, golpes_player1,
-                                                                                    movimientos_player2,
-                                                                                    golpes_player2):
-        if turno == 1:
-            # Jugador 1 realiza el movimiento
-            resultado.append({'accion': f'Tonyn realiza el movimiento {movimiento_player1}'})
+    for movimiento_player1, golpe_player1, movimiento_player2, golpe_player2 in zip(player1.movimientos, player1.golpes,
+                                                                                    player2.movimientos,
+                                                                                    player2.golpes):
+        # Realizar movimiento del jugador 1 y agregar al resultado
+        resultado.append({'accion': player1.realizar_movimiento(movimiento_player1)})
 
-            if golpe_player1:
-                # Jugador 1 ejecuta el golpe y actualiza la energía del jugador 2
-                resultado.append({'accion': f'Tonyn ejecuta el golpe {golpe_player1}'})
-                energia_player2 = calcular_energia(energia_player2, golpe_player1)
-        else:
-            # Jugador 2 realiza el movimiento
-            resultado.append({'accion': f'Arnaldor realiza el movimiento {movimiento_player2}'})
+        if golpe_player1:
+            # Ejecutar golpe del jugador 1, actualizar la energía del jugador 2 y agregar al resultado
+            resultado.append({'accion': player1.ejecutar_golpe(golpe_player1)})
+            player2.calcular_energia(golpe_player1)
 
-            if golpe_player2:
-                # Jugador 2 ejecuta el golpe y actualiza la energía del jugador 1
-                resultado.append({'accion': f'Arnaldor ejecuta el golpe {golpe_player2}'})
-                energia_player1 = calcular_energia(energia_player1, golpe_player2)
+        # Realizar movimiento del jugador 2 y agregar al resultado
+        resultado.append({'accion': player2.realizar_movimiento(movimiento_player2)})
 
-        turno = 2 if turno == 1 else 1
+        if golpe_player2:
+            # Ejecutar golpe del jugador 2, actualizar la energía del jugador 1 y agregar al resultado
+            resultado.append({'accion': player2.ejecutar_golpe(golpe_player2)})
+            player1.calcular_energia(golpe_player2)
 
-        # Verificar si alguno de los jugadores ha perdido toda su energía
-        if energia_player1 == 0:
-            resultado.append(
-                {'accion': f'Arnaldor Shuatseneguer Gana la pelea y le queda {energia_player2} de energía'})
+        # Verificar si algún jugador ha perdido toda su energía
+        if player1.energia == 0:
+            resultado.append({'accion': f'{player2.nombre} Gana la pelea y le queda {player2.energia} de energía'})
             break
-        elif energia_player2 == 0:
-            resultado.append({'accion': f'Tonyn Stallone Gana la pelea y le queda {energia_player1} de energía'})
+        elif player2.energia == 0:
+            resultado.append({'accion': f'{player1.nombre} Gana la pelea y le queda {player1.energia} de energía'})
             break
 
     # Devolver el resultado de la pelea como una respuesta JSON
