@@ -1,4 +1,3 @@
-FROM ubuntu:latest
 LABEL authors="cmendoza"
 FROM python:3.11
 
