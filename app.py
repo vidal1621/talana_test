@@ -56,14 +56,42 @@ def ejecutar_pelea():
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
     """json_data = '''
-{
-  "player1": {
-    "movimientos": ["D","DSD","S","DSD","SD"],
-    "golpes": ["K","P","","K","P"]
-  },
-  "player2": {
-    "movimientos": ["SA","SA","SA","ASA","SA"],
-    "golpes": ["K","","K","P","P"]
-  }
-}
-'''"""
+            {
+              "player1": {
+                "movimientos": ["D","DSD","S","DSD","SD"],
+                "golpes": ["K","P","","K","P"]
+              },
+              "player2": {
+                "movimientos": ["SA","SA","SA","ASA","SA"],
+                "golpes": ["K","","K","P","P"]
+              }
+            }
+            result =
+            [
+            
+                    {
+                        "accion": "Tonyn realiza el movimiento D"
+                    },
+                    {
+                        "accion": "Tonyn ejecuta el golpe K"
+                    },
+                    {
+                        "accion": "Arnaldor realiza el movimiento SA"
+                    },
+                    {
+                        "accion": "Tonyn realiza el movimiento S"
+                    },
+                    {
+                        "accion": "Arnaldor realiza el movimiento ASA"
+                    },
+                    {
+                        "accion": "Arnaldor ejecuta el golpe P"
+                    },
+                    {
+                        "accion": "Tonyn realiza el movimiento SD"
+                    },
+                    {
+                        "accion": "Tonyn ejecuta el golpe P"
+                    }
+            ]
+    '''"""
