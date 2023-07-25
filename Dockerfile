@@ -1,4 +1,4 @@
-LABEL authors="cmendoza"
+
 FROM python:3.11
 
 WORKDIR /app
@@ -13,4 +13,4 @@ EXPOSE 5000
 ENTRYPOINT ["python3"]
 
 CMD ["app.py"]
-# Path: talana_test/app.py
+LABEL authors="cmendoza"
